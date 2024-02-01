@@ -8,7 +8,6 @@ import cv2
 
 
 class Qrimg:
-
     def __init__(self, img_path, size):
         self.img_path = img_path
         self.read_img()
@@ -17,7 +16,10 @@ class Qrimg:
 
         self.img = Qrimg.resize(self.img, size)
         self.img_luminance = Qrimg.resize(self.img_luminance, size)
-
+    
+    def get_img_name(self):
+        return self.img_path.split("/")[-1]
+    
     def read_img(self):
         self.img = cv2.imread(self.img_path, flags=cv2.IMREAD_COLOR)
 
@@ -27,7 +29,8 @@ class Qrimg:
 
     def read_mask(self):
         self.blendmask = cv2.imread(
-            "{}/BlendMask/{}".format(self.img_path[:4], self.img_path[12:]), flags=cv2.IMREAD_GRAYSCALE)
+            "/Users/as6325400/Project/IS-QRcode/isqr/BlendMask/{}".format(self.get_img_name()), flags=cv2.IMREAD_GRAYSCALE)
+        
 
     @classmethod
     def show(cls, img, flag, window_name):
@@ -70,7 +73,14 @@ class Qrimg:
         return enlarge_img
 
     @classmethod
-    def resize(cls, img, size):
+    def resize(cls, img, size):    
+        if img is None:
+            print("Error: Input image is empty.")
+            
+        
+        if size <= 0:
+            print("Error: Invalid target size.")
+            
         return cv2.resize(img, (size, size), interpolation=cv2.INTER_LINEAR)
 
     # 秀出QR code的codeword的index

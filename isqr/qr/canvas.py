@@ -14,6 +14,7 @@ import numpy as np
 import itertools
 import math
 from copy import deepcopy
+import matplotlib.pyplot as plt
 
 # position pattern
 position_pattern = np.zeros((7, 7))
@@ -579,6 +580,8 @@ class Canvas:
                         reverse_mask(row, col)
         # 最後回傳的是此function一開始宣告的mask_image
         # 不影響原始的image
+        # plt.imshow(mask_image, cmap="gray")
+        # plt.show()
         return mask_image
 
     # 這邊和後面用resize去處理圖片不一樣

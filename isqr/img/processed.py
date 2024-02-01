@@ -6,6 +6,7 @@ import numpy as np
 import cv2
 import sys
 import math
+import matplotlib.pyplot as plt
 
 from ..qr import *
 from .img import Qrimg
@@ -134,7 +135,7 @@ class Process:
         return matrix
 
     @classmethod
-    def select_module(cls, canvas: Canvas, args: QrArgs, data: QrData, blendmask,
+    def select_module(cls, canvas: Canvas, args: QrArgs, data: QrData,
                       base_qrcode, binary_image):
         extra_bit_stream_lst = []
         RS_bit_stream_lst = []
@@ -190,8 +191,8 @@ class Process:
                 else:
                     module_type_array[row, col] = 3
 
-        print("Length of encoded message:{}".format(data.data_bitstream_length))
-        print("----------------------------")
+        # print("Length of encoded message:{}".format(data.data_bitstream_length))
+        # print("----------------------------")
 
         # 先處理位於BlendMask輸出的結果內的Module，因為他們包含最重要的資訊
         # 所以優先處理
@@ -245,20 +246,20 @@ class Process:
             valid_mask_count_in_current_block = 0
             for bi in range(canvas.args.size):
                 for bj in range(canvas.args.size):
-                    if canvas.block_no[bi, bj] == i+1 and blendmask[bi, bj] != 255 and module_type_array[bi, bj] != 1:
+                    if canvas.block_no[bi, bj] == i+1 and module_type_array[bi, bj] != 1:
                         valid_mask_count_in_current_block += 1
 
-            if i < args.nbg1:
-                print("number of control module available in block {}: {} - {} = {}".format(
-                    i+1, args.nbg1b, current_length, args.nbg1b - current_length))
-                print("valid mask count in block {}: {}".format(
-                    i+1, valid_mask_count_in_current_block))
-            else:
-                print("number of control module available in block {}: {} - {} = {}".format(
-                    i+1, args.nbg2b, current_length, args.nbg2b - current_length))
-                print("valid mask count in block {}: {}".format(
-                    i+1, valid_mask_count_in_current_block))
-            print("----------------------------")
+            # if i < args.nbg1:
+            #     print("number of control module available in block {}: {} - {} = {}".format(
+            #         i+1, args.nbg1b, current_length, args.nbg1b - current_length))
+            #     print("valid mask count in block {}: {}".format(
+            #         i+1, valid_mask_count_in_current_block))
+            # else:
+            #     print("number of control module available in block {}: {} - {} = {}".format(
+            #         i+1, args.nbg2b, current_length, args.nbg2b - current_length))
+            #     print("valid mask count in block {}: {}".format(
+            #         i+1, valid_mask_count_in_current_block))
+            # print("----------------------------")
             should_break = False
             if i < args.nbg1:
                 while count < args.nbg1b - current_length and count != valid_mask_count_in_current_block:
@@ -275,14 +276,14 @@ class Process:
                             if module_type_array[selected_row[j], selected_col[j]] != 3 or \
                                     canvas.block_no[selected_row[j], selected_col[j]] != i+1:
                                 continue
-                            if blendmask[selected_row[j], selected_col[j]] != 255:
-                                control_module_index.append(
-                                    int(canvas.module_block_index[i, selected_row[j], selected_col[j]]))
-                                module_type_array[selected_row[j],
-                                                  selected_col[j]] = 2
-                                selected_module_in_mask[selected_row[j],
-                                                        selected_col[j]] = 1
-                                count += 1
+                            
+                            control_module_index.append(
+                                int(canvas.module_block_index[i, selected_row[j], selected_col[j]]))
+                            module_type_array[selected_row[j],
+                                                selected_col[j]] = 2
+                            selected_module_in_mask[selected_row[j],
+                                                    selected_col[j]] = 1
+                            count += 1
 
                             if count >= args.nbg1b - current_length:
                                 should_break = True
@@ -333,14 +334,14 @@ class Process:
                             if module_type_array[selected_row[j], selected_col[j]] != 3 or \
                                     canvas.block_no[selected_row[j], selected_col[j]] != i+1:
                                 continue
-                            if blendmask[selected_row[j], selected_col[j]] != 255:
-                                control_module_index.append(
-                                    int(canvas.module_block_index[i, selected_row[j], selected_col[j]]))
-                                selected_module_in_mask[selected_row[j],
-                                                        selected_col[j]] = 1
-                                module_type_array[selected_row[j],
-                                                  selected_col[j]] = 2
-                                count += 1
+                            
+                            control_module_index.append(
+                                int(canvas.module_block_index[i, selected_row[j], selected_col[j]]))
+                            selected_module_in_mask[selected_row[j],
+                                                    selected_col[j]] = 1
+                            module_type_array[selected_row[j],
+                                                selected_col[j]] = 2
+                            count += 1
 
                             if count >= args.nbg2b - current_length:
                                 should_break = True

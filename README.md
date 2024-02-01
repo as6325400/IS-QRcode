@@ -35,7 +35,7 @@
 
 使用方法，執行main.py檔案，並且傳入適當的參數。
 
-python3 main.py v l m o img --mask -ms -s
+python3 main.py v l m img o --mask -ms -s
 
 v: QR code所使用的版本(1~40)。
 

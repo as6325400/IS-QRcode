@@ -7,6 +7,7 @@
 
 import os
 import cv2
+import matplotlib.pyplot as plt
 
 
 class Output:
@@ -18,7 +19,10 @@ class Output:
         
         if not os.path.isdir("isqr/output/{}/{}".format(self.folder_path, self.level)):
             os.mkdir("isqr/output/{}/{}".format(self.folder_path, self.level))
-            
+    
+    def get_img_name(self):
+        return self.img_path.split("/")[-1]
+    
     def save_baseline(self, img):
         cv2.imwrite(
             "isqr/output/{}/{}/baseline.png".format(self.folder_path, self.level), img)
@@ -28,7 +32,7 @@ class Output:
             os.mkdir(
                 "isqr/output/{}/{}/pixel-based-binary".format(self.folder_path, self.level))
         cv2.imwrite("isqr/output/{}/{}/pixel-based-binary/{}".format(self.folder_path,
-                    self.level, self.img_path[12:]), img)
+                    self.level, self.get_img_name()), img)
 
     def save_binary(self, img):
         cv2.imwrite("isqr/output/{}/{}/{}".format(self.folder_path,
@@ -43,14 +47,14 @@ class Output:
             os.mkdir(
                 "isqr/output/{}/{}/gaussian-jordan".format(self.folder_path, self.level))
         cv2.imwrite("isqr/output/{}/{}/gaussian-jordan/{}".format(
-            self.folder_path, self.level, self.img_path[12:]), img)
+            self.folder_path, self.level, self.get_img_name()), img)
 
     def save_codeword_type(self, img):
         if not os.path.isdir("isqr/output/{}/{}/type_adjusted".format(self.folder_path, self.level)):
             os.mkdir(
                 "isqr/output/{}/{}/type_adjusted".format(self.folder_path, self.level))
         cv2.imwrite("isqr/output/{}/{}/type_adjusted/{}".format(self.folder_path,
-                    self.level, self.img_path[12:]), img)
+                    self.level, self.get_img_name()), img)
 
     def save_blending(self, img):
         if not os.path.isdir("isqr/output/{}/{}/blending".format(self.folder_path, self.level)):
@@ -60,11 +64,11 @@ class Output:
             os.mkdir(
                 "isqr/output/{}/{}/blending_H".format(self.folder_path, self.level))
         cv2.imwrite("isqr/output/{}/{}/blending/{}".format(self.folder_path,
-                    self.level, self.img_path[12:]), img)
+                    self.level, self.get_img_name()), img)
 
     def save_blending_H(self, img, subsize, quality_factor):
         if not os.path.isdir("isqr/output/{}/{}/blending_H/{}_{}".format(self.folder_path, self.level, subsize, quality_factor)):
             os.mkdir("isqr/output/{}/{}/blending_H/{}_{}".format(self.folder_path,
                      self.level, subsize, quality_factor))
         cv2.imwrite("isqr/output/{}/{}/blending_H/{}_{}/{}".format(self.folder_path,
-                    self.level, subsize, quality_factor, self.img_path[12:]), img)
+                    self.level, subsize, quality_factor, self.get_img_name()), img)

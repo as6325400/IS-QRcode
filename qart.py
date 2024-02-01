@@ -1,11 +1,3 @@
-# Modified at: 2023.4.4
-# Author: Steven
-# Usage: main function that start this project.
-
-"""Aesthetic QR code generation
-此module實作了結合實例分割模型與高斯消去法，來產生美化過後的QR code。
-須透過command line傳入產生QR code時所需要的各種參數
-"""
 from isqr.qr import QrData
 from isqr.qr import QrArgs
 from isqr.qr import Canvas
@@ -18,51 +10,42 @@ import time
 import numpy as np
 
 
-def main():
-    # =========================
-    # 解析cmd參數
-    # =========================
-    parser = argparse.ArgumentParser(
-        description="Generate aesthetic QR code", epilog="Hope you enjoy!"
-    )
-    parser.add_argument("v", help="Version, must be 1~40", type=int)
-    parser.add_argument("l", help="Correction level, must be LMQH")
-    parser.add_argument("m", help="Message want to encode in QR code")
+def qart(v, l, m, img, mask=0, module_size=13):
+    
+    # "v", help="Version, must be 1~40", type=int)
+    # "l", help="Correction level, must be LMQH")
+    # "m", help="Message want to encode in QR code")
 
-    parser.add_argument("img", help="Image path that embedded in QR code")
-    parser.add_argument("o", help="folder path that save the image")
-    parser.add_argument(
-        "--mask",
-        help="Mask use in generating QR code, must be 0~7",
-        default=0,
-        type=int,
-    )
+    # "img", help="Image path that embedded in QR code")
+    
+    # "--mask",
+    # help="Mask use in generating QR code, must be 0~7",
+    # default=0,
+    # type=int,
+    
 
-    parser.add_argument(
-        "-ms",
-        "--module_size",
-        help="Determine how many pixels in a module",
-        default=13,
-        type=int,
-    )
-    parser.add_argument(
-        "-s",
-        "--subsize",
-        help="Determine subsize of single module",
-        default=3,
-        type=int,
-    )
+    
+    # "-ms",
+    # "--module_size",
+    # help="Determine how many pixels in a module",
+    # default=13,
+    # type=int,
+    
+    
+    # "-s",
+    # "--subsize",
+    # help="Determine subsize of single module",
+    # default=3,
+    # type=int,
+    
 
-    argv = sys.argv[1:]
-    args = parser.parse_args(argv)
 
     # 取得
-    qrargs = QrArgs(args.v, args.l, args.mask)
+    qrargs = QrArgs(v, l, mask)
 
     # 處理input message的部分
-    qrdata = QrData(qrargs, args.m)
-    output = Output(args.o, args.l, args.img)
-
+    qrdata = QrData(qrargs, m)
+    
     # 資料編碼
     qrdata.decide_encode_mode()
     qrdata.message2bitstream()
@@ -90,7 +73,7 @@ def main():
     # Qrimg.show(base_qrcode, "B", "QR code after masking")
 
     # 將QR code放大，讓之後可以和image做Blending的操作
-    enlarge_base_qrcode = Qrimg.enlarge(base_qrcode, args.module_size)
+    enlarge_base_qrcode = Qrimg.enlarge(base_qrcode, module_size)
 
     # print("Show codewords' index")
     # Qrimg.show_codeword_index(qrcanvas.codeword_index, "Codewords' Index")
@@ -104,7 +87,7 @@ def main():
     # ------------------------------------------------------------------------------------------------------------------------------------------------ #
     # 後續處理(QR code synthesis)的部分
     # 輸入圖片
-    source = Qrimg(args.img, qrargs.size * args.module_size)
+    source = Qrimg(img, qrargs.size * module_size)
 
     # print("Show forbidden area and data codewords region")
     # Qrimg.show(qrcanvas.m, "B", "Forbidden area and Data codewords region")
@@ -113,7 +96,6 @@ def main():
     # 原圖之luminance & binary image
     # Pixel-baesd Binary Image
     binary_img_source, old_threshold, variance = Process.OTSU(source.img_luminance)
-    print("Threshold:{}, variance:{}".format(old_threshold, variance))
     # print("Show luminance & binary image for source image")
     # Qrimg.show(source.img_luminance, "B", "Luminance image for source image")
     # Qrimg.show(binary_img_source, "B", "Binary image for source image")
@@ -121,12 +103,12 @@ def main():
 
     # Module-Based-Blending
     binary_image = Process.module_based_binarization(
-        source.img_luminance, args.module_size
+        source.img_luminance, module_size
     )
     Ideal_qr = Process.module_based_blending(base_qrcode, binary_image, qrcanvas.m)
-    enlarge_binary_image = Qrimg.enlarge(binary_image, args.module_size)
+    enlarge_binary_image = Qrimg.enlarge(binary_image, module_size)
     # output.save_binary(enlarge_binary_image)
-    enlarge_Ideal_qr = Qrimg.enlarge(Ideal_qr, args.module_size)
+    enlarge_Ideal_qr = Qrimg.enlarge(Ideal_qr, module_size)
     # output.save_Ideal(enlarge_Ideal_qr)
     # print("Show image after binarization & blending with masked QR code")
     # Qrimg.show(binary_image, "B", "Image after binarization")
@@ -144,13 +126,10 @@ def main():
     qrcanvas.set_bitstream_without_type()
 
     XOR_qrcode = qrcanvas.apply_mask()
-    print("QR code after adjustment")
+    # print("QR code after adjustment")
     Qrimg.show(XOR_qrcode, "B", "QR code after adjustment")
-    output.save_jordan(XOR_qrcode)
+    
 
 
 if __name__ == "__main__":
-    start_time = time.time()
-    main()
-    end_time = time.time()
-    print("Execution time: {}".format(end_time - start_time))
+    qart(6, "L", "Hello World", "/Users/as6325400/Project/IS-QRcode/isqr/source/1.png")
